@@ -1,6 +1,47 @@
-import '@/styles/globals.css'
-import type { AppProps } from 'next/app'
+import "@/styles/globals.css";
+import type { AppProps } from "next/app";
+import { SessionProvider } from "next-auth/react";
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
+
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import { SWRConfig } from "swr";
+
+import { lightTheme } from "@/themes";
+import { AuthProvider, CartProvider, UiProvider } from "@/context";
+import { useEffect, useState } from "react";
 
 export default function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+  const [showChild, setShowChild] = useState(false);
+  useEffect(() => {
+    setShowChild(true);
+  }, []);
+
+  if (!showChild) return <></>;
+
+  return (
+    <SessionProvider>
+      <PayPalScriptProvider
+        options={{ clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "" }}
+      >
+        <SWRConfig
+          value={{
+            // refreshInterval: 3000,
+            fetcher: (resource, init) =>
+              fetch(resource, init).then((res) => res.json()),
+          }}
+        >
+          <AuthProvider>
+            <CartProvider>
+              <UiProvider>
+                <ThemeProvider theme={lightTheme}>
+                  <CssBaseline />
+                  <Component {...pageProps} />
+                </ThemeProvider>
+              </UiProvider>
+            </CartProvider>
+          </AuthProvider>
+        </SWRConfig>
+      </PayPalScriptProvider>
+    </SessionProvider>
+  );
 }
