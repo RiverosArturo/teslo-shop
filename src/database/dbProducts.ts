@@ -13,7 +13,10 @@ export const getProductsBySlug = async(slug: string):Promise<IProduct | null> =>
     }
 
     //TODO:
-    //Prodcesamiento de las imagenes cuando las subamos
+    //Procesamiento de las imagenes cuando las subamos
+    product.images = product.images.map( img => {
+        return img.includes('http') ? img : `${process.env.HOST_NAME}/products/${img}`
+    })
     
     //Forzamos al objeto a que sea serealizado como un string
     return JSON.parse(JSON.stringify( product ));
@@ -41,8 +44,17 @@ export const getProductsByTerm = async( term:string): Promise<IProduct[]> => {
         .select('title images price inStock slug -_id')
         .lean();
     await db.disconnect();
+    
+    const updatedProducts = products.map( product => {
+        //Procesamiento de las imagenes cuando las subamos
+        product.images = product.images.map( img => {
+            return img.includes('http') ? img : `${process.env.HOST_NAME}/products/${img}`
+        })
 
-    return products;
+        return product;
+    })
+    
+    return updatedProducts;
 }
 
 export const getAllProducts = async() :Promise<IProduct[]> => {
@@ -50,6 +62,14 @@ export const getAllProducts = async() :Promise<IProduct[]> => {
         const products = await Product.find().lean();
     await db.disconnect();
     
+    const updatedProducts = products.map( product => {
+        //Procesamiento de las imagenes cuando las subamos
+        product.images = product.images.map( img => {
+            return img.includes('http') ? img : `${process.env.HOST_NAME}/products/${img}`
+        })
+
+        return product;
+    })
     
-    return JSON.parse( JSON.stringify(products) );
+    return JSON.parse( JSON.stringify(updatedProducts) );
 }

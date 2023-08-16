@@ -130,7 +130,7 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
         data: form,
       });
 
-      // console.log({ data });
+      console.log({ data });
       if (!form._id) {
         //Recargar el navegador
         router.replace(`/admin/products/${form.slug}`);
@@ -158,9 +158,23 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
           formData
         );
 
-        // console.log(data);
+        // console.log(data.message);
+
+        setValue("images", [...getValues("images"), data.message], {
+          shouldValidate: true,
+        });
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const onDeleteImage = (image: string) => {
+    setValue(
+      "images",
+      getValues("images").filter((img) => img !== image),
+      { shouldValidate: true }
+    );
   };
 
   return (
@@ -406,20 +420,27 @@ const ProductAdminPage: FC<Props> = ({ product }) => {
                 label="Es necesario al 2 imagenes"
                 color="error"
                 variant="outlined"
+                sx={{
+                  display: getValues("images").length < 2 ? "flex" : "none",
+                }}
               />
 
               <Grid container spacing={2}>
-                {product.images.map((img) => (
+                {getValues("images").map((img) => (
                   <Grid item xs={4} sm={3} key={img}>
                     <Card>
                       <CardMedia
                         component="img"
                         className="fadeIn"
-                        image={`/products/${img}`}
+                        image={img}
                         alt={img}
                       />
                       <CardActions>
-                        <Button fullWidth color="error">
+                        <Button
+                          fullWidth
+                          color="error"
+                          onClick={() => onDeleteImage(img)}
+                        >
                           Borrar
                         </Button>
                       </CardActions>
