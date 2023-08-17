@@ -39,7 +39,7 @@ export const Navbar = () => {
         <NextLink href="/" passHref legacyBehavior>
           <Link display="flex" alignItems="center">
             <Typography variant="h6">Teslo |</Typography>
-            <Typography sx={{ marginLeft: 0.5 }}>Shop</Typography>
+            <Typography sx={{ marginLeft: 0.5 }}>Shop!</Typography>
           </Link>
         </NextLink>
 
